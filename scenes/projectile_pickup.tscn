@@ -1,0 +1,32 @@
+[gd_scene load_steps=5 format=3 uid="uid://rw4liyhxdpsu"]
+
+[ext_resource type="Script" uid="uid://do6k83pdy4sxq" path="res://fsm/scripts/projectile_pickup.gd" id="1_uhw4q"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_72atj"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_gprej"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_xv0ct"]
+radius = 6.0
+
+[node name="Projectile_Pickup" type="Node2D"]
+script = ExtResource("1_uhw4q")
+
+[node name="Ground" type="MeshInstance2D" parent="."]
+modulate = Color(0.9502471, 0.52096105, 0.21045747, 1)
+position = Vector2(-2.3841858e-07, 2.3841858e-07)
+scale = Vector2(5.9999995, 5.9999995)
+mesh = SubResource("BoxMesh_72atj")
+
+[node name="Projectile" type="MeshInstance2D" parent="."]
+modulate = Color(0.6822291, 0.0018410975, 0.86197233, 1)
+position = Vector2(-2.682209e-07, 2.3841858e-07)
+scale = Vector2(4.0045357, 4.004536)
+mesh = SubResource("SphereMesh_gprej")
+
+[node name="Area2D" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource("CircleShape2D_xv0ct")
+
+[connection signal="body_entered" from="Area2D" to="." method="_on_area_2d_body_entered"]
