@@ -13,14 +13,14 @@ func getCamFor(index):
 func _process(delta):
 	if Input.is_action_just_pressed("ui_right"):
 		currently_watching += 1
-		if currently_watching > 49:
+		if currently_watching > get_parent().population_size-1:
 			currently_watching = -1
 		getCamFor(currently_watching)
 		
 	elif Input.is_action_just_pressed("ui_left"):
 		currently_watching -= 1
 		if currently_watching < -1:
-			currently_watching = 49
+			currently_watching = get_parent().population_size-1
 		getCamFor(currently_watching)
 	
 	elif Input.is_action_just_pressed("ui_up"):

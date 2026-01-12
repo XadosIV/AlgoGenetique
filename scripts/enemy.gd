@@ -44,8 +44,6 @@ func _ready():
 	agent.radius = 16
 	agent.path_desired_distance = 4
 	agent.target_desired_distance = 8
-	
-	
 
 func _process(delta):
 	throw_timer -= delta

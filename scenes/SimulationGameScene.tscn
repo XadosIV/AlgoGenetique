@@ -143,12 +143,6 @@ jail_point = NodePath("../../JAIL_POINT")
 patrol_points_node = NodePath("../../patrol_points4")
 player = NodePath("../../Player")
 
-[node name="Enemy4" parent="Enemies" node_paths=PackedStringArray("jail_point", "patrol_points_node", "player") instance=ExtResource("4_1imcn")]
-position = Vector2(364, 448)
-jail_point = NodePath("../../JAIL_POINT")
-patrol_points_node = NodePath("../../patrol_points3")
-player = NodePath("../../Player")
-
 [node name="JAIL_POINT" type="Marker2D" parent="."]
 position = Vector2(154, 92)
 

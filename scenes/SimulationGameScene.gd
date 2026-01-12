@@ -145,7 +145,7 @@ func _process(delta):
 	# 5. Temps passé en prison
 	# -----------------------------
 	if player.inJail:
-		fitness -= 5 * delta
+		fitness /= 1.2
 
 	# -----------------------------
 	# 6. Mettre à jour la distance
