@@ -1,16 +1,14 @@
 extends Node2D  # on ne peut pas dessiner directement sur RayCast2D
 
-@export var ray_length := 1000
+@export var ray_length := 250
 @export var angle_step := 5
 @export var fov := 30  # degrés de chaque côté
 
 var player_in_sight = false
-var last_player_pos = Vector2.ZERO
-
-
+var last_player_pos
 var res = []
 
-func _process(delta):
+func _process(_delta):
 	queue_redraw()  # redessine à chaque frame
 	res = []
 	player_in_sight = false
@@ -28,6 +26,8 @@ func _process(delta):
 			if result.collider.name == "Player":
 				player_in_sight = true
 				last_player_pos = result.position
+		else:
+			res.append(params.to)
 
 func _draw():
 	for i in res:
