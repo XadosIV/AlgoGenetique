@@ -1,7 +1,7 @@
 [gd_scene load_steps=6 format=3 uid="uid://bt208k2axyp65"]
 
-[ext_resource type="Script" uid="uid://dq7dv7vdxbi46" path="res://scripts/enemy.gd" id="1_hfe4l"]
-[ext_resource type="Script" uid="uid://b110por5urid7" path="res://scripts/fov.gd" id="2_x6a12"]
+[ext_resource type="Script" uid="uid://dq7dv7vdxbi46" path="res://scripts/ingame/enemy.gd" id="1_hfe4l"]
+[ext_resource type="Script" uid="uid://b110por5urid7" path="res://scripts/ingame/fov.gd" id="2_x6a12"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_boauc"]
 size = Vector3(30, 30, 1)

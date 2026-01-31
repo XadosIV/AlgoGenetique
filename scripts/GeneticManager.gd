@@ -2,32 +2,23 @@ extends Node
 
 @export var game_scene : PackedScene
 @export var image_of_player_scene : PackedScene
-@export var simulation_scene : Node2D
 
-var population_size = 30
-var simulation_time = 20.0
-var percent_election = 0.2 # Pourcentage d'individu utilisé pour créer la gen d'après
-var parent_still = true # garde les parents pour la génération suivante
-var percent_mutation = 0.1 # pourcentage de mutation de chaque gène
-
-var thegoat : PackedFloat32Array
-
-
-
+# PARAMETRES
+@export var population_size = 40
+@export var simulation_time = 20.0
+@export var percent_election = 0.2 # Pourcentage d'individu utilisé pour créer la gen d'après
+@export var parent_still = true # garde les parents pour la génération suivante
+@export var percent_mutation = 0.2 # pourcentage de mutation de chaque gène
+@export var highlight_best_numbers = 8 # Nombre d'individus affichés en vert (= les meilleurs)
 
 var timer = 0.0
-
 var simulations = []
 var imageOfPlayers = []
 var generation = 0
 
 var spawn_position = Vector2(72,97)
 
-
-
 func _ready():
-	Engine.time_scale = 2
-	
 	for i in population_size:
 		var p = image_of_player_scene.instantiate()
 		p.index = i
@@ -36,15 +27,13 @@ func _ready():
 	
 	create_new_simulations()
 
-
-
 func _process(delta):
 	Engine.time_scale = 5
 	timer += delta
 	
 	var maximum_score = simulations[0].fitness
 	var maximum_index = 0
-	var thegoatindex = 0
+	var nb_exited = 0
 	
 	for i in range(simulations.size()):
 		var refPlayer = simulations[i].player
@@ -58,11 +47,6 @@ func _process(delta):
 			imageOfPlayers[i].visible = true
 			
 		
-		if simulations[i].genome == thegoat:
-			imageOfPlayers[i].visible = true
-			thegoatindex = i
-			imageOfPlayers[i].modulate = Color.YELLOW
-		
 		if simulations[i].fitness > maximum_score:
 			maximum_index = i
 			maximum_score = simulations[i].fitness
@@ -71,6 +55,10 @@ func _process(delta):
 			simulations[i].visible = true
 		else:
 			simulations[i].visible = false
+	
+		if simulations[i].exit_reached:
+			nb_exited += 1
+	
 	
 	var scored = []
 	for i in range(len(simulations)):
@@ -84,29 +72,18 @@ func _process(delta):
 	# Trier par fitness décroissante
 	scored = sort_by_fitness_desc(scored)
 	
-	# Sélection : garder les top X% comme parents
-	var top_count = int(population_size * percent_election)
-	var parents = scored.slice(0, top_count)
-	
-	for p in parents:
-		if p["genome"] != thegoat:
-			imageOfPlayers[p["index"]].modulate = Color.GREEN
+	for i in range(highlight_best_numbers):
+		imageOfPlayers[scored[i]["index"]].modulate = Color.GREEN
 	
 	
 	$Camera/Label.text = "Gen : " + str(generation)
 	$Camera.bestIndex = maximum_index
 
-	var text := ""
-	for v in thegoat:
-		text += str(snapped(v, 0.01)) + ","
-
-	var hashed := text.sha1_text()
-	var goatname = hashed.substr(0, 10)
-
 	if $Camera.currently_watching != -1:
-		$Camera/Label3.text = "Fitness : " + str(simulations[$Camera.currently_watching].fitness)
+		var exit_reached = "Yes" if simulations[$Camera.currently_watching].exit_reached else "No"
+		$Camera/Label3.text = "Fit : " + str(int(simulations[$Camera.currently_watching].fitness)) + " Exited : " + exit_reached
 	else:
-		$Camera/Label3.text = "Fit : " + str(round(maximum_score)) + " G : " + str(round(simulations[thegoatindex].fitness)) + " " + goatname
+		$Camera/Label3.text = "Fit : " + str(int(round(maximum_score))) + " Exited : " + str(nb_exited)
 	
 	if timer >= simulation_time:
 		end_generation()
@@ -124,7 +101,6 @@ func sort_by_fitness_desc(scored_array):
 				scored_array[i] = scored_array[j]
 				scored_array[j] = temp
 	return scored_array
-	
 
 func end_generation():
 	# Récupérer les genomes et fitness
@@ -142,7 +118,7 @@ func end_generation():
 	
 	print("Génération %d, meilleur score : %f" % [generation, scored[0].fitness])
 	
-	# Sélection : garder les top 20% comme parents
+	# Sélection : garder les top X% comme parents
 	var top_count = int(population_size * percent_election)
 	var parents = scored.slice(0, top_count)
 	
@@ -166,15 +142,14 @@ func end_generation():
 		
 		# Mutation aléatoire
 		for i in child.size():
-			if randf() < percent_mutation: # 10% chance de muter chaque gène
+			if randf() < percent_mutation: # X% chance de muter chaque gène
 				child[i] += randf_range(-0.5, 0.5)
 		
 		new_genomes.append(child)
 	
-	for parent in parents:
-		new_genomes.append(parent["genome"])
-	
-	thegoat = parents[0]["genome"]
+	if parent_still:
+		for parent in parents:
+			new_genomes.append(parent["genome"])
 	
 	new_genomes.shuffle()
 	# Créer les nouvelles simulations
@@ -202,5 +177,7 @@ func create_new_simulations(new_genomes=[]):
 			var g = game_scene.instantiate()
 			g.visible = false
 			g.position = Vector2((i+1) * 2500, 0)
+			# Si aucun génome n'est donné, c'est 
+			# la simulation qui se charge d'en générer un.
 			$Simulations.add_child(g)
 			simulations.append(g)

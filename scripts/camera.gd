@@ -10,7 +10,7 @@ func getCamFor(index):
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
+func _process(_delta):
 	if Input.is_action_just_pressed("ui_right"):
 		currently_watching += 1
 		if currently_watching > get_parent().population_size-1:
